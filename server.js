@@ -1,8 +1,8 @@
 var express = require('express'); 
 var app = express();  
 var server = app.listen(process.env.PORT || 5000,function(){
-	
-  console.log("Express server listening on port %d in %s mode", process.env.PORT, app.settings.env);
+
+  console.log("Express server listening in %s mode", process.env.PORT, app.settings.env);
 })
 var io = require('socket.io').listen(server);
 
@@ -17,6 +17,7 @@ class Player {
 	  constructor(id) {
 	    this.score = 0;
 	    this.id = id;
+	    this.name = "";
 	  };
 };
 
@@ -31,8 +32,13 @@ io.on("connection",function(socket){
 
 	socket.on("updateScore",function(){
 		Player.list[socket.id].score++;
-		updateLeaderList(); 
+		updateLeaderList();  
 		socket.emit("updateScore",Player.list[socket.id].score); 
+	});
+
+	socket.on("setPlayerName",function(playerName){
+		console.log("New Player: " , playerName)
+		Player.list[socket.id].name = playerName;
 	});
 
 	function updateLeaderList(){

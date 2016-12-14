@@ -20,12 +20,13 @@
  
 
 var game = new Phaser.Game(window.innerWidth , window.innerHeight, Phaser.CANVAS, 'gameArea', { preload: preload, create: create });
-
+var playerName = "";
 var leaderText = [];
 
 
 function preload() {
-
+	 var playerName = prompt("Please enter your name", "");
+	 socket.emit("setPlayerName", playerName);
 	 game.load.image('trump', 'images/trump_3.jpg');
 
 }
@@ -76,6 +77,9 @@ function create() {
     tapperText.anchor.setTo(0.5, 0.5);
     footerText.anchor.setTo(0.5, 0.5); 
 
+
+    
+
     socket.on("pCount",function(pCount){ 
 	 	pCountText.setText("Players: " + pCount); 	 			
 	});
@@ -125,7 +129,7 @@ socket.on("leaderUpdate",function(leaders){
 	for (user in leaders) { 
 		console.log(user);
 
-		var text = game.add.text(90, 35 + (userNum + 1) * 40 , ""+ leaders[user].id +" - " + leaders[user].score, {
+		var text = game.add.text(90, 35 + (userNum + 1) * 40 , ""+ leaders[user].name +" - " + leaders[user].score, {
 	        font: "18px Arial",
 	        fill: "#ff0044",
 	        align: "center"
