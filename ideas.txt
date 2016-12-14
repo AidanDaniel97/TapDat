@@ -1,0 +1,7 @@
+current players in the leader board 
+
+
+
+leader list 
+
+each object is player object the player object hold score

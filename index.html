@@ -1,0 +1,146 @@
+<html>
+	<head> 
+	<script type="text/javascript" src="js/phaser.js"></script>
+	<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>	
+        <script>
+
+            var socket = io();
+
+
+
+        </script>
+	<style>
+		body{
+			margin:0px;
+		}
+	</style>
+	</head>
+	<body>
+	<script>
+ 
+
+var game = new Phaser.Game(window.innerWidth , window.innerHeight, Phaser.CANVAS, 'gameArea', { preload: preload, create: create });
+
+var leaderText = [];
+
+
+function preload() {
+
+	 game.load.image('trump', 'images/trump_3.jpg');
+
+}
+ 
+
+function create() {
+	game.stage.backgroundColor = '#ffffff';
+    game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+	game.scale.pageAlignHorizontally = true;
+	game.scale.pageAlignVertically = true; 
+    game.input.onTap.add(onTap, this);
+    game.renderer.renderSession.roundPixels = true;
+    game.physics.startSystem(Phaser.Physics.ARCADE); 
+    emitter = game.add.emitter(0, 0, 100); 
+    emitter.makeParticles('trump');
+    emitter.gravity = 200;
+    emitter.minParticleScale = 0.5;
+    emitter.maxParticleScale = 0.5;
+
+    count = 0;
+  	
+  	var leaderBoardTitle = game.add.text(90, 40, "- Top Tap Dats -\n", {
+        font: "3em Arial",
+        fill: "#ff0044",
+        align: "center"
+    }); 
+
+    var tapperText = game.add.text(game.world.centerX, game.world.centerY - 20, "- You have tapped -\n0 times !", {
+        font: "3em Arial",
+        fill: "#ff0044",
+        align: "center"
+    });
+
+    var footerText = game.add.text(game.world.centerX, window.innerHeight - 30, "TapDat. Keep tapping. Refreshing will clear your tap score.", {
+        font: "3em Arial",
+        fill: "#ff0044",
+        align: "center"
+    });
+
+    var pCountText = game.add.text(90, 50, "Players: 1", {
+	        font: "3em Arial",
+	        fill: "#ff0044",
+	        align: "center"
+	    });
+
+    pCountText.anchor.setTo(0.5, 0.5);
+    leaderBoardTitle.anchor.setTo(0.5, 0.5);
+    tapperText.anchor.setTo(0.5, 0.5);
+    footerText.anchor.setTo(0.5, 0.5); 
+
+    socket.on("pCount",function(pCount){ 
+	 	pCountText.setText("Players: " + pCount); 	 			
+	});
+ 
+
+	socket.on("updateScore",function(score){
+		tapperText.setText("- You have tapped -\n" + score + " times !"); 
+	});
+   
+};
+
+function onTap(pointer, doubleTap) {
+    //particleBurst(pointer);
+    updateScore();
+};
+
+
+function particleBurst(pointer) {
+
+    //  Position the emitter where the mouse/touch event was
+    emitter.x = pointer.x;
+    emitter.y = pointer.y;
+
+    //  The first parameter sets the effect to "explode" which means all particles are emitted at once
+    //  The second gives each particle a 2000ms lifespan
+    //  The third is ignored when using burst/explode mode
+    //  The final parameter (10) is how many particles will be emitted in this single burst
+    emitter.start(true, 3000, null, 1);
+
+};
+
+function updateScore() {
+	socket.emit("updateScore");
+};
+
+
+
+
+socket.on("leaderUpdate",function(leaders){
+	//Clear text
+	console.log(leaders)
+	for (text in leaderText){
+		leaderText[text].destroy();
+	}
+	//Write new ones
+	userNum = 1;
+	for (user in leaders) { 
+		console.log(user);
+
+		var text = game.add.text(90, 35 + (userNum + 1) * 40 , ""+ leaders[user].id +" - " + leaders[user].score, {
+	        font: "18px Arial",
+	        fill: "#ff0044",
+	        align: "center"
+	    });
+	    text.anchor.setTo(0.5, 0.5);
+
+	    leaderText.push(text);
+	    userNum++
+	}	
+});
+
+
+
+	</script>
+
+
+	</body>
+</html>
