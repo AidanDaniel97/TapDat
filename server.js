@@ -1,6 +1,9 @@
 var express = require('express'); 
 var app = express();  
-var server = app.listen(process.env.PORT || 5000)
+var server = app.listen(process.env.PORT || 5000,function(){
+	
+  console.log("Express server listening on port %d in %s mode", process.env.PORT, app.settings.env);
+})
 var io = require('socket.io').listen(server);
 
 app.use(express.static('./'));
