@@ -119,13 +119,13 @@ function updateScore() {
 
 
 socket.on("leaderUpdate",function(leaders){
-	//Clear text
+	//Clear text 
 	for (text in leaderText){
 		leaderText[text].destroy();
 	}
 	//Write new ones
 	userNum = 1;
-	for (user in leaders) { 
+	for (user in leaders) {  
 
 		var text = game.add.text(90, 35 + (userNum + 1) * 40 , ""+ leaders[user].name +" - " + leaders[user].score, {
 	        font: "18px Arial",
