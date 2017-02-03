@@ -2,6 +2,7 @@
 	<head> 
 	<script type="text/javascript" src="js/phaser.js"></script>
 	<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet">	
         <script>
 
@@ -21,7 +22,7 @@
 		.modal_popup {
 		    width: 500px;
 		    height: 500px;
-		    background-color: #bbbbbb;
+		    background-color: #d6d6d6;
 		    position: absolute;
 		    top: 0;
 		    bottom: 0;
@@ -30,28 +31,93 @@
 		    margin: auto;
 		    border-radius: 10px;
 		    text-align: center;
+		    z-index:100;
 		}
+
+		.modal_popup > p{
+			margin-top:77px;
+		}
+
+
+		.modal_popup_image{
+			width:300px;
+			height:160px;
+			padding:10px;
+			margin-top: 50px;
+		}
+
+
+		#game_overlay{
+			 background-color: #333;
+		    opacity: 0.8;
+		    position: absolute;
+		    left: 0px;
+		    top: 0px;
+		    z-index: 10;
+		    height: 100%;
+		    width: 100%;
+		    overflow: hidden; 
+		    background-position: center;
+		    background-repeat: no-repeat;
+
+		}
+
+		#player_name_input{
+			padding:15px;
+			font-size:19px;
+			text-align: center;
+		}
+
 	</style>
 	</head>
 	<body>
 
-	<div class="modal_popup">
-		<h1>Welcome to HyperTap</h1>
-		Name: <input type="text"/>
+
+	<form id="welcome_form">
+		<div class="modal_popup">
+			<h1>Welcome to HyperTap</h1><br>
+			<div>
+				<input type="text" id="player_name_input" placeholder="Nickname..."/>
+			</div>
+			<img class="modal_popup_image" src="images/tapGif.gif">
+			<p>Keep Tapping, refreshing will clear your tap score.</p>
+		</div> 
+	</form>
+
+	<div id="leader_board_holder">
+		<ol id="leader_board">
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+		</ol>
 	</div>
+
+	<div id="game_overlay"></div>
+	<div id="game_area"></div>
+
+
+
 
 	<script>
  
+	 $( "#welcome_form" ).submit(function( event ) {
+	  playerName = $("#player_name_input").val();
+	  socket.emit("setPlayerName", playerName);
+	  event.preventDefault();
+	  $('#welcome_form').css("display","none");
+	  $('#game_overlay').css("display","none"); 
+	});
 
 
-var game = new Phaser.Game(window.innerWidth , window.innerHeight, Phaser.CANVAS, 'gameArea', { preload: preload, create: create });
+var game = new Phaser.Game(window.innerWidth , window.innerHeight, Phaser.CANVAS, 'game_area', { preload: preload, create: create });
 var playerName = "";
 var leaderText = [];
 
 
 function preload() {
-	 //var playerName = prompt("Please enter your name", "");
-	 socket.emit("setPlayerName", playerName);
+	 
 	 game.load.image('trump', 'images/trump_3.jpg');
 
 }
@@ -73,11 +139,7 @@ function create() {
 
     count = 0;
   	
-  	var leaderBoardTitle = game.add.text(90, 40, "- Top Tap Dats -\n", {
-        font: "3em Arial",
-        fill: "#ff0044",
-        align: "center"
-    }); 
+  	 
 
     var tapperText = game.add.text(game.world.centerX, game.world.centerY - 20, "- You have tapped -\n0 times !", {
         font: "3em Arial",
@@ -97,8 +159,7 @@ function create() {
 	        align: "center"
 	    });
 
-    pCountText.anchor.setTo(0.5, 0.5);
-    leaderBoardTitle.anchor.setTo(0.5, 0.5);
+    pCountText.anchor.setTo(0.5, 0.5); 
     tapperText.anchor.setTo(0.5, 0.5);
     footerText.anchor.setTo(0.5, 0.5); 
 
@@ -144,24 +205,21 @@ function updateScore() {
 
 
 socket.on("leaderUpdate",function(leaders){
-	//Clear text 
-	for (text in leaderText){
-		leaderText[text].destroy();
-	}
-	//Write new ones
-	userNum = 1;
-	for (user in leaders) {  
+	 
+ 
+		   
+		   var listItems = $("#leader_board li");
+			listItems.each(function(index, li) {
+			    var product = $(li); 
+			    if (leaders[index]){
+			   	 product.text(leaders[index].name + " : " + leaders[index].score + " taps")
+			   	}
+		 		  
 
-		var text = game.add.text(90, 35 + (userNum + 1) * 40 , ""+ leaders[user].name +" - " + leaders[user].score, {
-	        font: "18px Arial",
-	        fill: "#ff0044",
-	        align: "center"
-	    });
-	    text.anchor.setTo(0.5, 0.5);
 
-	    leaderText.push(text);
-	    userNum++
-	}	
+			    // and the rest of your code
+			});
+	    
 });
 
 

@@ -81,7 +81,9 @@ io.on("connection",function(socket){
 	}
 	
 
-	socket.on("disconnect",function(){ 
+	socket.on("disconnect",function(){
+
+		console.log("Player disconnected - " , Player.list[socket.id])
 		delete Player.list[socket.id]; 
 		for (player in leaders){
 			if (leaders[player].id == socket.id){ 
