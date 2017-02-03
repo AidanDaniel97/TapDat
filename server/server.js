@@ -1,12 +1,13 @@
 var express = require('express'); 
-var app = express();  
+var app = express();   
+var path = require('path');
 var server = app.listen(process.env.PORT || 5000,function(){
 
   console.log("Express server listening in %s mode", process.env.PORT, app.settings.env);
 })
 var io = require('socket.io').listen(server);
 
-app.use(express.static('./'));
+app.use(express.static(path.join(__dirname, '../client')));
 app.get('/', function(req, res){
 	res.send('index.html'); 
 }); 

@@ -1,7 +1,8 @@
 <html>
 	<head> 
 	<script type="text/javascript" src="js/phaser.js"></script>
-	<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>	
+	<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+	<link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet">	
         <script>
 
             var socket = io();
@@ -13,11 +14,35 @@
 		body{
 			margin:0px;
 		}
+		*{
+			font-family: 'Orbitron', sans-serif;
+		}
+
+		.modal_popup {
+		    width: 500px;
+		    height: 500px;
+		    background-color: #bbbbbb;
+		    position: absolute;
+		    top: 0;
+		    bottom: 0;
+		    left: 0;
+		    right: 0;
+		    margin: auto;
+		    border-radius: 10px;
+		    text-align: center;
+		}
 	</style>
 	</head>
 	<body>
+
+	<div class="modal_popup">
+		<h1>Welcome to HyperTap</h1>
+		Name: <input type="text"/>
+	</div>
+
 	<script>
  
+
 
 var game = new Phaser.Game(window.innerWidth , window.innerHeight, Phaser.CANVAS, 'gameArea', { preload: preload, create: create });
 var playerName = "";
@@ -25,7 +50,7 @@ var leaderText = [];
 
 
 function preload() {
-	 var playerName = prompt("Please enter your name", "");
+	 //var playerName = prompt("Please enter your name", "");
 	 socket.emit("setPlayerName", playerName);
 	 game.load.image('trump', 'images/trump_3.jpg');
 
