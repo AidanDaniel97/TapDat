@@ -26,10 +26,11 @@ Player.list = {};
 Player.pCount = 0;
 
 io.on("connection",function(socket){ 
-	Player.pCount++; 
-	io.emit("pCount",Player.pCount);
+	
+	console.log(Player.pCount)
 	io.emit("leaderUpdate",leaders);
 	Player.list[socket.id] = new Player(socket.id);
+
 
 	socket.on("updateScore",function(){
 		Player.list[socket.id].score++;
@@ -40,6 +41,8 @@ io.on("connection",function(socket){
 	socket.on("setPlayerName",function(playerName){
 		console.log("New Player: " , playerName)
 		Player.list[socket.id].name = playerName;
+		Player.pCount++; 
+		io.emit("pCount",Player.pCount);
 	});
 
 	function updateLeaderList(){
@@ -83,7 +86,11 @@ io.on("connection",function(socket){
 
 	socket.on("disconnect",function(){
 
-		console.log("Player disconnected - " , Player.list[socket.id])
+		console.log("Player disconnected - " , Player.list[socket.id]);
+		if (Player.list[socket.id].name){//If user was playing / had a name
+			Player.pCount--;
+		}
+
 		delete Player.list[socket.id]; 
 		for (player in leaders){
 			if (leaders[player].id == socket.id){ 
@@ -91,9 +98,11 @@ io.on("connection",function(socket){
 			}
 		}
 
-		Player.pCount--;
+
+		
 		io.emit("pCount",Player.pCount);
 		io.emit("leaderUpdate",leaders);
+		console.log(leaders)
 
 	});
 
