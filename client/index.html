@@ -3,6 +3,8 @@
 	<script type="text/javascript" src="js/phaser.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+	<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet">	
         <script>
 
@@ -110,11 +112,14 @@
 	<div id="player_count_holder">
 		<p id="player_count_text">Current Player: 0</p>
 	</div>
+
+	<p id="tapper_text">You have tapped 0 times</p>
 </div>
 
 
+
  
-	<p id="tapper_text">You have tapped 0 times</p>
+	
 	 
 
 
@@ -156,26 +161,16 @@ function create() {
     emitter = game.add.emitter(0, 0, 100); 
     emitter.makeParticles('trump');
     emitter.gravity = 200;
-    emitter.minParticleScale = 0.5;
-    emitter.maxParticleScale = 0.5;
+    emitter.minParticleScale = 0.2;
+    emitter.maxParticleScale = 0.2;
 
     count = 0;
   	
   	 
 
-    
+    //TapDat. Keep tapping. Refreshing will clear your tap score.
 
-    var footerText = game.add.text(game.world.centerX, window.innerHeight - 30, "TapDat. Keep tapping. Refreshing will clear your tap score.", {
-        font: "3em Arial",
-        fill: "#ff0044",
-        align: "center"
-    });
-
-  
-    footerText.anchor.setTo(0.5, 0.5); 
-
-
-    
+     
 
     socket.on("pCount",function(pCount){ 
 	 	$('#player_count_text').text("Current Players: " + pCount);	 			
@@ -189,7 +184,7 @@ function create() {
 };
 
 function onTap(pointer, doubleTap) {
-    //particleBurst(pointer);
+    particleBurst(pointer);
     updateScore();
 };
 
@@ -204,7 +199,7 @@ function particleBurst(pointer) {
     //  The second gives each particle a 2000ms lifespan
     //  The third is ignored when using burst/explode mode
     //  The final parameter (10) is how many particles will be emitted in this single burst
-    emitter.start(true, 3000, null, 1);
+    emitter.start(true, 3000, null, 5);
 
 };
 
