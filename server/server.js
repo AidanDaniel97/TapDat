@@ -47,6 +47,12 @@ io.on("connection", function(socket) {
         socket.emit("updateScore", Player.list[socket.id].score);
     });
 
+
+    socket.on("chat_message",function(msg){
+    	console.log("New chat message")
+    	io.emit("chat_message" , msg);
+    });
+
     socket.on("setPlayerName", function(playerName) {
         console.log(colors.info("New Player: %s "), playerName)
         Player.list[socket.id].name = playerName;

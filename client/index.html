@@ -80,6 +80,27 @@
 		    pointer-events: none;
 		}
 
+
+		.messages_holder{
+			position: fixed;
+    		bottom: 0;
+    		left: 0;
+		}
+
+		.messages_holder ul{
+			    height: 120px;
+		}
+
+		#chat_form{
+			padding:0;
+			margin:0;
+		}
+
+		#messages_list { list-style-type: none; margin: 0; padding: 0;background-color: white; overflow-y: scroll;}
+      #messages_list li { padding: 5px 10px; }
+      #messages_list li:nth-child(odd) { background: #eee; }
+      #messages_list li:nth-child(even) { background: white}
+
 	</style>
 	</head>
 	<body>
@@ -119,7 +140,13 @@
 
 
  
-	
+<div class="messages_holder">
+	<ul id="messages_list"></ul>
+    <form id="chat_form" action="">
+      <input id="chat_text" autocomplete="off" /><button>Send</button>
+    </form>
+</div>
+
 	 
 
 
@@ -138,6 +165,19 @@
 	  $('#welcome_form').css("display","none");
 	  $('#game_overlay').css("display","none"); 
 	});
+
+
+	  $( "#chat_form" ).submit(function( event ) {
+	  	event.preventDefault(); 
+	  	socket.emit("chat_message", $("#chat_text" ).val());
+	  	$("#chat_text" ).val("");
+	});
+
+
+	  socket.on("chat_message",function(msg){
+	  	 $('#messages_list').append($('<li>').text(msg));
+	  	 $('#messages_list').scrollTop($('#messages_list')[0].scrollHeight);
+	  })
 
 
 var game = new Phaser.Game(window.innerWidth , window.innerHeight, Phaser.CANVAS, 'game_area', { preload: preload, create: create });
