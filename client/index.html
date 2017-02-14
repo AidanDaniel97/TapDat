@@ -1,279 +1,299 @@
 <html>
-	<head> 
-	<script type="text/javascript" src="js/phaser.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-	<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet">	
-        <script>
 
-            var socket = io();
+<head>
+    <script type="text/javascript" src="js/phaser.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet">
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <script>
+        var socket = io();
+    </script>
+    <style>
+        body {
+            margin: 0px;
+        }
+        
+        * {
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .modal-header {
+            text-align: center;
+        }
+        
+        #player_name_input {
+            padding: 15px;
+            font-size: 19px;
+            text-align: center;
+        }
+        
+        .tap_stats {
+            position: absolute;
+            pointer-events: none;
+        }
+        
+        #tapper_text {
+            text-align: center;
+            pointer-events: none;
+        }
+        
+        .messages_holder {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+        }
+        
+        .messages_holder ul {
+            height: 120px;
+        }
+        
+        #chat_form {
+            padding: 0;
+            margin: 0;
+        }
+        
+        #chat_text{
+        	width:100%;
+        }
 
+        #messages_list {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            background-color: rgba(154, 154, 154, 0.53);
+            overflow-y: scroll;
+        }
+        
+        #messages_list li {
+            padding: 5px 10px;
+        }
+        
+        #messages_list li:nth-child(odd) {
+            background: rgba(113, 113, 113, 0.6);
+        }
+        
+        #messages_list li:nth-child(even) {
+            background: background-color: rgba(154, 154, 154, 0.53);
+        }
 
+        .tap_count{    width: 248px;
+    height: 100px; 
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+            pointer-events: none;}
 
-        </script>
-	<style>
-		body{
-			margin:0px;
-		}
-		*{
-			font-family: 'Orbitron', sans-serif;
-		}
+    #player_count_holder{
+    	float: right;
+    	padding: 10px;
+    }
+    </style>
+</head>
 
-		.modal_popup {
-		    width: 500px;
-		    height: 500px;
-		    background-color: #d6d6d6;
-		    position: absolute;
-		    top: 0;
-		    bottom: 0;
-		    left: 0;
-		    right: 0;
-		    margin: auto;
-		    border-radius: 10px;
-		    text-align: center;
-		    z-index:100;
-		}
-
-		.modal_popup > p{
-			margin-top:77px;
-		}
-
-
-		.modal_popup_image{
-			width:300px;
-			height:160px;
-			padding:10px;
-			margin-top: 50px;
-		}
-
-
-		#game_overlay{
-			 background-color: #333;
-		    opacity: 0.8;
-		    position: absolute;
-		    left: 0px;
-		    top: 0px;
-		    z-index: 10;
-		    height: 100%;
-		    width: 100%;
-		    overflow: hidden; 
-		    background-position: center;
-		    background-repeat: no-repeat;
-
-		}
-
-		#player_name_input{
-			padding:15px;
-			font-size:19px;
-			text-align: center;
-		}
-
-		.tap_stats{
-			position: absolute;
-		    pointer-events: none;
-		}
-
-		#tapper_text{
-			text-align:center;
-		    pointer-events: none;
-		}
-
-
-		.messages_holder{
-			position: fixed;
-    		bottom: 0;
-    		left: 0;
-		}
-
-		.messages_holder ul{
-			    height: 120px;
-		}
-
-		#chat_form{
-			padding:0;
-			margin:0;
-		}
-
-		#messages_list { list-style-type: none; margin: 0; padding: 0;background-color: white; overflow-y: scroll;}
-      #messages_list li { padding: 5px 10px; }
-      #messages_list li:nth-child(odd) { background: #eee; }
-      #messages_list li:nth-child(even) { background: white}
-
-	</style>
-	</head>
-	<body>
+<body>
 
 
 
-	<form id="welcome_form">
-		<div class="modal_popup">
-			<h1>Welcome to HyperTap</h1><br>
-			<div>
-				<input type="text" id="player_name_input" placeholder="Nickname..."/>
-			</div>
-			<!--<img class="modal_popup_image" src="images/tapGif.gif">-->
-			<p>Keep Tapping, refreshing will clear your tap score.</p>
-		</div> 
-	</form>
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:10px 50px;">
+                    <h4>Welcome to HyperTap</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <form id="welcome_form" role="form">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="player_name_input" placeholder="Enter nickname">
+                        </div>
+                        <button type="submit" data-dismiss="modal" id="play_button" class="btn btn-success btn-block">Begin</button>
+                    </form>
+                </div>
+            </div>
 
-
-<div class="tap_stats">
-	<div id="leader_board_holder">
-		<ol id="leader_board">
-			<li></li>
-			<li></li>
-			<li></li>
-			<li></li>
-			<li></li>
-		</ol>
-	</div>
-
-	<div id="player_count_holder">
-		<p id="player_count_text">Current Player: 0</p>
-	</div>
-
-	<p id="tapper_text">You have tapped 0 times</p>
-</div>
-
-
-
- 
-<div class="messages_holder">
-	<ul id="messages_list"></ul>
-    <form id="chat_form" action="">
-      <input id="chat_text" autocomplete="off" /><button>Send</button>
-    </form>
-</div>
-
-	 
-
-
-	<div id="game_overlay"></div>
-	<div id="game_area"></div>
-
-
-
-
-	<script>
- 
-	 $( "#welcome_form" ).submit(function( event ) {
-	  playerName = $("#player_name_input").val();
-	  socket.emit("setPlayerName", playerName);
-	  event.preventDefault();
-	  $('#welcome_form').css("display","none");
-	  $('#game_overlay').css("display","none"); 
-	});
-
-
-	  $( "#chat_form" ).submit(function( event ) {
-	  	event.preventDefault(); 
-	  	socket.emit("chat_message", $("#chat_text" ).val());
-	  	$("#chat_text" ).val("");
-	});
-
-
-	  socket.on("chat_message",function(msg){
-	  	 $('#messages_list').append($('<li>').text(msg));
-	  	 $('#messages_list').scrollTop($('#messages_list')[0].scrollHeight);
-	  })
-
-
-var game = new Phaser.Game(window.innerWidth , window.innerHeight, Phaser.CANVAS, 'game_area', { preload: preload, create: create });
-var playerName = "";
-var leaderText = [];
-
-
-function preload() {
-	 
-	 game.load.image('trump', 'images/trump_3.jpg');
-
-}
+        </div>
+    </div>
+    </div>
  
 
-function create() {
-	game.stage.backgroundColor = '#ffffff';
-    game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL; 
-    game.input.onTap.add(onTap, this);
-    game.renderer.renderSession.roundPixels = true;
-    game.physics.startSystem(Phaser.Physics.ARCADE); 
-    emitter = game.add.emitter(0, 0, 100); 
-    emitter.makeParticles('trump');
-    emitter.gravity = 200;
-    emitter.minParticleScale = 0.2;
-    emitter.maxParticleScale = 0.2;
-
-    count = 0;
-  	
-  	 
-
-    //TapDat. Keep tapping. Refreshing will clear your tap score.
-
-     
-
-    socket.on("pCount",function(pCount){ 
-	 	$('#player_count_text').text("Current Players: " + pCount);	 			
-	});
- 
-
-	socket.on("updateScore",function(score){
-		 $('#tapper_text').text("You have tapped " + score +" times")
-	});
-   
-};
-
-function onTap(pointer, doubleTap) {
-    particleBurst(pointer);
-    updateScore();
-};
 
 
-function particleBurst(pointer) {
 
-    //  Position the emitter where the mouse/touch event was
-    emitter.x = pointer.x;
-    emitter.y = pointer.y;
+        <div class="tap_count">
+        <p id="tapper_text">You have tapped 0 times</p>
+        </div>
 
-    //  The first parameter sets the effect to "explode" which means all particles are emitted at once
-    //  The second gives each particle a 2000ms lifespan
-    //  The third is ignored when using burst/explode mode
-    //  The final parameter (10) is how many particles will be emitted in this single burst
-    emitter.start(true, 3000, null, 5);
+<!--Player count-->
+        <div id="player_count_holder">
+            <p id="player_count_text">Current Player: 0</p>
+        </div>
 
-};
+    <!--Stats-->
+    <div class="tap_stats">
 
-function updateScore() {
-	socket.emit("updateScore");
-};
+    	<!--Scoreboard-->
+        <div id="leader_board_holder">
+            <ol id="leader_board">
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+            </ol>
+        </div>
+
+        
+    </div>
+
+
+
+    <!--Player count-->
+    <div class="messages_holder">
+        <ul id="messages_list"></ul>
+        <form id="chat_form" action="">
+            <input id="chat_text" autocomplete="off" /><button class="btn btn-success btn-block">Send</button>
+        </form>
+    </div>
 
 
 
 
-socket.on("leaderUpdate",function(leaders){
-	 
- 
-		   
-		   var listItems = $("#leader_board li");
-			listItems.each(function(index, li) { 
-			    var leader_value = $(li); 
-			    if (leaders[index]){
-			   	 leader_value.text(leaders[index].name + " : " + leaders[index].score + " taps")
-			   	}else{
-			   	 leader_value.text("")
-		 		  
-
-
-			    // and the rest of your code
-			   	}
-			});
-	    
-});
+    <div id="game_area"></div>
 
 
 
-	</script>
+
+    <script>
 
 
-	</body>
+        $("#play_button").click(function(event) {
+            playerName = $("#player_name_input").val();
+            socket.emit("setPlayerName", playerName);
+            event.preventDefault();
+        });
+
+
+        $("#chat_form").submit(function(event) {
+            event.preventDefault();
+            socket.emit("chat_message", $("#chat_text").val());
+            $("#chat_text").val("");
+        });
+
+
+        socket.on("chat_message", function(message_data) {
+            $('#messages_list').append($('<li>').text(message_data.name + ": " + message_data.message));
+            $('#messages_list').scrollTop($('#messages_list')[0].scrollHeight);
+        })
+
+
+        var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.CANVAS, 'game_area', {
+            preload: preload,
+            create: create
+        });
+        var playerName = "";
+        var leaderText = [];
+
+        $('#myModal').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+
+
+        function preload() {
+
+            game.load.image('trump', 'images/trump_3.jpg');
+
+        }
+
+
+        function create() {
+            game.stage.backgroundColor = '#ffffff';
+            game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+            game.input.onTap.add(onTap, this);
+            game.renderer.renderSession.roundPixels = true;
+            game.physics.startSystem(Phaser.Physics.ARCADE);
+            emitter = game.add.emitter(0, 0, 100);
+            emitter.makeParticles('trump');
+            emitter.gravity = 200;
+            emitter.minParticleScale = 0.2;
+            emitter.maxParticleScale = 0.2;
+
+            count = 0;
+
+
+
+            //TapDat. Keep tapping. Refreshing will clear your tap score.
+
+
+
+            socket.on("pCount", function(pCount) {
+                $('#player_count_text').text("Current Players: " + pCount);
+            });
+
+
+            socket.on("updateScore", function(score) {
+                $('#tapper_text').text("You have tapped " + score + " times")
+            });
+
+        };
+
+        function onTap(pointer, doubleTap) {
+            particleBurst(pointer);
+            updateScore();
+        };
+
+
+        function particleBurst(pointer) {
+
+            //  Position the emitter where the mouse/touch event was
+            emitter.x = pointer.x;
+            emitter.y = pointer.y;
+
+            //  The first parameter sets the effect to "explode" which means all particles are emitted at once
+            //  The second gives each particle a 2000ms lifespan
+            //  The third is ignored when using burst/explode mode
+            //  The final parameter (10) is how many particles will be emitted in this single burst
+            emitter.start(true, 3000, null, 5);
+
+        };
+
+        function updateScore() {
+            socket.emit("updateScore");
+        };
+
+
+
+
+        socket.on("leaderUpdate", function(leaders) {
+
+
+
+            var listItems = $("#leader_board li");
+            listItems.each(function(index, li) {
+                var leader_value = $(li);
+                if (leaders[index]) {
+                    leader_value.text(leaders[index].name + " : " + leaders[index].score + " taps")
+                } else {
+                    leader_value.text("")
+                    // and the rest of your code
+                }
+            });
+
+        });
+
+
+        
+    </script>
+
+
+</body>
+
 </html>

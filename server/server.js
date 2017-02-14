@@ -48,9 +48,9 @@ io.on("connection", function(socket) {
     });
 
 
-    socket.on("chat_message",function(msg){
-    	console.log("New chat message")
-    	io.emit("chat_message" , msg);
+    socket.on("chat_message",function(msg){ 
+    	message_data = {"name":Player.list[socket.id].name,"message":msg}
+    	io.emit("chat_message" , message_data);
     });
 
     socket.on("setPlayerName", function(playerName) {
