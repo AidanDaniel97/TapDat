@@ -85,7 +85,7 @@ io.on("connection", function(socket) {
             }
 
             if (playerFound == false) {
-                if (leaders_global.length < 5) {
+                if (leaders_global.length < 3) {
                     leaders_global.push(Player.list[socket.id]);
                 }
 
